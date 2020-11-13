@@ -126,6 +126,12 @@ func TestWorkerClient(t *testing.T) {
 					return
 				}
 
+				argEtaAsyncResult, err := celeryClient.DelayEta(argTaskName, time.Now().Format(time.RFC3339), arg1, arg2)
+				if err != nil {
+					t.Errorf("failed to submit arg task %s: %v", argTaskName, err)
+					return
+				}
+
 				debugLog(celeryClient, "waiting for result")
 				kwargVal, err := kwargAsyncResult.Get(10 * time.Second)
 				if err != nil {
@@ -149,6 +155,20 @@ func TestWorkerClient(t *testing.T) {
 
 				debugLog(celeryClient, "validating result")
 				actual = int(argVal.(float64))
+				if actual != expected {
+					t.Errorf("returned result %v is different from expected value %v", actual, expected)
+					return
+				}
+
+				debugLog(celeryClient, "waiting for result")
+				argEtaVal, err := argEtaAsyncResult.Get(10 * time.Second)
+				if err != nil {
+					t.Errorf("failed to get result: %v", err)
+					return
+				}
+
+				debugLog(celeryClient, "validating result")
+				actual = int(argEtaVal.(float64))
 				if actual != expected {
 					t.Errorf("returned result %v is different from expected value %v", actual, expected)
 					return

@@ -55,6 +55,14 @@ func (cc *CeleryClient) Delay(task string, args ...interface{}) (*AsyncResult, e
 	return cc.delay(celeryTask)
 }
 
+// Delay gets asynchronous result with ETA
+func (cc *CeleryClient) DelayETA(task string, eta string, args ...interface{}) (*AsyncResult, error) {
+	celeryTask := getTaskMessage(task)
+	celeryTask.Args = args
+	celeryTask.ETA = eta
+	return cc.delay(celeryTask)
+}
+
 // DelayKwargs gets asynchronous results with argument map
 func (cc *CeleryClient) DelayKwargs(task string, args map[string]interface{}) (*AsyncResult, error) {
 	celeryTask := getTaskMessage(task)
